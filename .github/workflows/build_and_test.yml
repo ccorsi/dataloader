@@ -8,6 +8,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  checks: write
+  pull-requests: write
+
 env:
   BUILD_DIR: build
   # TESTRESULTS_DIR: testResults
