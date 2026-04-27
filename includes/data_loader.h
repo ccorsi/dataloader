@@ -7,7 +7,7 @@
  *
  * @copyright Copyright (c) 2024 Claudio Corsi
  *
- * @license MIT License https://raw.githubusercontent.com/ccorsi/learning/main/LICENSE
+ * @license MIT License https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE
  */
 
 #ifndef __DATA_LOADER_H__

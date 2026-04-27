@@ -7,7 +7,7 @@
  *
  * @copyright Copyright (c) 2024 Claudio Corsi
  *
- * @license MIT License https://raw.githubusercontent.com/ccorsi/learning/main/LICENSE
+ * @license MIT License https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE
  */
 
 #include <iostream>
@@ -1650,7 +1650,7 @@ TEST(DataLoaderTestSuite, BinaryDataLoadingTest) {
 
     if (fin.is_open() == false) {
         // workaround with executing individual test within vscode
-        fin.open("../../data/HelloWorld.class",
+        fin.open("../data/HelloWorld.class",
             fin.binary | fin.in);
     }
 
