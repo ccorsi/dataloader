@@ -41,3 +41,4 @@ jobs:
       - name: Deploy the Data Loader Pages to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+          path: './doc'
