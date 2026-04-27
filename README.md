@@ -1,4 +1,4 @@
-# Data Loader
+# Data Loader {#mainpage}
 
 This project contains a flexible data loader that can be used to load data
 from an input stream into an instance of a class.  The data loader provides
