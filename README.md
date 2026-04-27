@@ -1,3 +1,6 @@
+[![Data Loader Template Class Build and Tests](https://github.com/ccorsi/dataloader/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/ccorsi/dataloader/actions/workflows/build_and_test.yml)
+[![Data Loader Documentation](https://github.com/ccorsi/dataloader/actions/workflows/docs.yml/badge.svg)](https://github.com/ccorsi/dataloader/actions/workflows/docs.yml)
+
 # Data Loader {#mainpage}
 
 This project contains a flexible data loader that can be used to load data
