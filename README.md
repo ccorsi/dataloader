@@ -31,18 +31,19 @@ template class.  We turn to describing its definition and use cases.
 The first thing that the data loader template class needs is its template
 parameters. The data loader template class requires at least two out of eight
 template parameters.  The first template parameter is the **Type** of instance
-that is being populated.  It them expects the **Char** template parameter which
+that is being populated.  It then expects the **Char** template parameter which
 is used to define a basic\_istream&lt;**Char**&gt; input stream.  This can be set
 to __char__ or __wchar_t__ character type input stream.  This is the default
 requirement that one needs to be able to use the data loader template class to
-load data into an object instance.  The above case assumes that the **Type**
-template parameter defines the
+load data into an instance.  The above case assumes that the **Type** template
+parameter defines the
 basic\_istream&lt;**Char**&gt; & operator&lt;&lt;(basic\_istream&lt;**Char**&gt; &)
 operator.
 
 While the above describes the required minimum template parameters of the data loader.
 It doesn't explain how one goes about initializing and using a data loader template class.
 We will start by explaining the other aspects of the data loader template class.
+
 The data loader template class is defined as:
 
 ```cpp
@@ -70,11 +71,11 @@ will describe what each parameter means.
 | Type | The type of object being populated |
 | Char | The type of input stream being used, __char__ or __wchar_t__ |
 | Reader | The Reader class used to process the data with |
-| fields | The number of fields associated with the Type object, defaults to __1__ |
+| fields | The number of fields populate in the Type object, defaults to __1__ |
 | IsOpenChar | Character used to demarcate opening of object data |
 | IsCloseChar | Character used to demarcate closing of object data |
-| IsSpace | Which spaces to skip before and after opening and closing characters |
-| IsSpaceInner | Which spaces to skip within the opening and closing characters |
+| IsSpace | Which spaces to skip before and after opening/closing characters |
+| IsSpaceInner | Which spaces to skip within the opening/closing characters |
 
 While the above is fairly clear it doesn't explain the details that are
 involved with these template parameters.  Let us then start with the most
@@ -87,7 +88,7 @@ data loader template class if we are using a __char__ or __wchar_t__ input
 stream.  We've thus explained the most basic data loader template parameters.
 We now turn to the more involved template parameters.
 
-We then start with how the __Reader__ template parameter is used.  This parameter
+We start with how the __Reader__ template parameter is used.  This parameter
 has to define a struct or class that implements the following operator:
 
 ```cpp
@@ -96,12 +97,12 @@ has to define a struct or class that implements the following operator:
 ```
 
 The above operator will be called by the data loader template class to actually
-load the data into the Type instance.  The first and second parameter is self
-explanatory but the third parameter is specific to how one whats to load the
-data into the Type instance.  For instance, one can define a struct or class
-that implements the above operator to populate a different field or it can read
-all of the data for all the fields for the Type instance.  Let us then look at
-what this might look like.  Let us then take a simple class with two fields:
+load the data into the **Type** instance.  The first and second parameter is self
+explainatory but the third parameter is specific to how one wants to load the
+data into the **Type** instance.  For instance, one can define a struct or class
+that implements the above operator to populate a seperate field or it can read
+all of the data for all the fields for the **Type** instance.  Let us then look at
+what this might look like.  Let us take a simple class with two fields:
 
 ```cpp
 class point {
@@ -117,7 +118,7 @@ public:
 We now look at how we can populate a point instance using the data loader
 template class.  Before we can talk about how to load the point instance using
 the data loader template class.  We need to explain what and how to use the
-remaining template parameters.  Let us start with the field template parameter.
+remaining template parameters.  Let us start with the __fields__ template parameter.
 
 The integer __fields__ template parameter is used to tell the data loader how
 many fields are associated with the __Type__ instance.  For instance, the
@@ -160,7 +161,7 @@ While the first two options are clear enough.  The requirement of the third opti
 as obvious.  The last option was required to solve a specific type of issue
 that I have not been able to resolve at the moment.  It is possible that that case
 will have a solution in the future but not at this time.  While the above options
-should cover most if not all of the different cases.  You aren't restricted to the above
+should cover most, if not all, of the different cases.  You aren't restricted to the above
 and you can implement your own by creating a struct or class that implements the following 
 operator:
 
@@ -172,21 +173,21 @@ struct characters {
 ```
 
 Basically, the operator method should return true if the passed character chr is
-the expected character else false.
+the expected character or not.
 
 Let us then talk about the remaining __IsSpace__ and __IsSpaceInner__ template
 parameters next.
 
 The __IsSpace__ and __IsSpaceInner__ template parameters are used to skip
-spaces that need to be skipped before reading the data to store into the
+spaces that need to be skipped before reading the data to be store in the
 data instance.  The __IsSpace__ is used to skip space-like characters prior
 to the instance data to be read.  While the __IsSpaceInner__ is used to
-skip spaces that seperate the fields values within the open and close
+skip spaces that seperate the field values within the open and close
 characters.  There are several predefined space-like operators avaliable:
 
 | Name | Description |
 | --- | --- |
-| is\_space\_noop&lt;Char&gt; | This is used when no spaces need to be skipped for Char stream type, char or wchar\_t |
+| is\_space\_noop&lt;Char&gt; | This is used when no spaces need to be skipped for the Char stream type, char or wchar\_t |
 | is\_space | This is a wrapper around the standard isspace method |
 | is\_wspace | This is a wrapper around the standard iswspace method |
 | is\_space\_or&lt;char...Chars&gt; | This extends the is\_space by including one or more user defined white space characters |
@@ -211,8 +212,8 @@ template class.  We can now look at how we can use the above information to read
 the data into a point instance using the data loader template class.
 
 This example will populate the point instance using a single instance of the
-data loader template class.  We need to first create a point reader that will
-be passed to the data loader template class which will be used read the data and
+data loader template class.  We first need to create a point **reader** that will
+be passed to the data loader template class that will be used to read the data and
 populate the point instance.
 
 ```cpp
@@ -236,9 +237,9 @@ struct point_reader {
 ```
 
 The above reader implementation will be used by the data loader template class
-to load the data into the point instance that is passed by reference.  Let us
-now create an instance of a data load template class using the above reader to
-load data into an instance of a point class.
+to load the data into the point instance that was passed by reference.  Let us
+now create an instance of a data loader template class using the above reader to
+load the data into an instance of a point class.
 
 ```cpp
 #include <data_loader.h>
@@ -261,8 +262,8 @@ std::istream& load_point(std::istream& in, point & pt) {
 }
 ```
 
-The above will then populate the passed point pt using the dataLoader instance
-with the data that is processed within the input stream.  The above is one
+The above will then populate the point instance pt using the dataLoader instance
+with the data that is processed using the input stream.  The above is one
 example of how one can use the data loader template class to populate
 instances.  The examples sub-directory contains examples on how you can use
-the data loader template class within different situations.
+the data loader template class for different user cases.

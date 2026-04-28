@@ -1,7 +1,7 @@
 # We are using the integrated version of GoogleTest with our builds and this is only supported in CMake 3.10.0 or greater
 cmake_minimum_required(VERSION 3.10.0)
 project("Data Loader"
-    VERSION 0.9.2 # Update the examples/CMakeLists.txt file
+    VERSION 0.9.3 # Update the examples/CMakeLists.txt file
     DESCRIPTION "Template Based Data Loader Class"
     HOMEPAGE_URL "https://github.com/ccorsi/dataloader/tree/main"
     LANGUAGES C CXX)
