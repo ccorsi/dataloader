@@ -1,3 +1,15 @@
+/**
+ * @file main.cpp
+ * @author Claudio Corsi (clcorsi@yahoo.com)
+ * @brief Simple example showing how to use the data loader template class to load an integer
+ * @version 0.1
+ * @date 2026-05-17
+ *
+ * @copyright Copyright (c) 2026 Claudio Corsi
+ *
+ * [MIT License](https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE)
+ */
+
 #include <iostream>
 #include <fstream>
 
@@ -5,6 +17,7 @@
 
 using namespace valhalla::loader;
 
+// @cond
 int main(int argc, char** argv) {
     std::cout << "Calling simple reader example\n";
 
@@ -27,3 +40,4 @@ int main(int argc, char** argv) {
         return 1;
     } // catch (std::exception & ex)
 }
+// @endcond

@@ -1,3 +1,15 @@
+/**
+ * @file main.cpp
+ * @author Claudio Corsi (clcorsi@yahoo.com)
+ * @brief This example shows how to use the data loader template class to populate instances using binary input data.
+ * @version 0.1
+ * @date 2026-05-17
+ *
+ * @copyright Copyright (c) 2026 Claudio Corsi
+ *
+ * [MIT License](https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE)
+ */
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,17 +21,42 @@
 using namespace valhalla::loader;
 using namespace valhalla::checkers;
 
+namespace examples {
+namespace protocol {
+
+/**
+ * @brief This point class will be used to store the (x,y) value of a point
+ *      on a plane
+ *
+ */
 class point {
     uint16_t m_x, m_y;
 public:
     point() = default;
+    /**
+     * @brief Construct a new point object using the passed values
+     *
+     * @param x value associated to the x axis point
+     * @param y value associated to the y axis point
+     */
     point(uint16_t x, uint16_t y) : m_x(x), m_y(y) {}
 
+    /**
+     * @brief This operator is used to display the data associated to a point instance
+     *
+     * @param out A reference to the output stream
+     * @param pt A reference to the point to display
+     * @return std::ostream& A reference to the passed output stream for chaining
+     */
     friend std::ostream& operator<<(std::ostream& out, const point & pt) {
         return out << "(" << pt.m_x << "," << pt.m_y << ")";
     }
 };
 
+/**
+ * @brief This class stores that data associated to a binary file
+ *
+ */
 class header {
     uint16_t m_major_version,
         m_minor_version,
@@ -27,10 +64,25 @@ class header {
     std::vector<point> m_points;
 public:
     header() = default;
+    /**
+     * @brief Construct a new header object using the passed data
+     *
+     * @param major the major value associated to this header
+     * @param minor the minor value associated to this header
+     * @param patch the patch value associated to this header
+     * @param points A array of points associated to this header
+     */
     header(uint16_t major, uint16_t minor, uint16_t patch, std::vector<point> & points) :
         m_major_version(major), m_minor_version(minor), m_patch_version(patch),
         m_points(points) {}
 
+    /**
+     * @brief This operator is used to display a header instance using the passed output stream
+     *
+     * @param out A reference to the output stream
+     * @param hdr A reference to the header instance to display
+     * @return std::ostream& A reference to the passed output stream for chaining
+     */
     friend std::ostream& operator<<(std::ostream& out, const header & hdr) {
         out << "header[major=" << hdr.m_major_version << ",minor="
             << hdr.m_minor_version << ", patch=" << hdr.m_patch_version
@@ -41,6 +93,10 @@ public:
     }
 };
 
+/**
+ * @brief Defines the magic number associated to the generated binary data file
+ *
+ */
 const uint8_t magic[]{
     static_cast<uint8_t>(0x12),
     static_cast<uint8_t>(0x34),
@@ -48,6 +104,14 @@ const uint8_t magic[]{
     static_cast<uint8_t>(0x78)
 };
 
+/**
+ * @brief This function is called to load an unsigned integer of two bytes
+ *  from a binary input stream into the referenced value that is passed.
+ *
+ * @param in A reference to the input stream with the binary data
+ * @param value A reference to the value that will be populated
+ * @return std::istream& A reference to the passed input stream for chaining
+ */
 std::istream& load_uint16_t(std::istream & in, uint16_t & value) {
     // clear the current quantity of the passed value;
     value = 0;
@@ -68,9 +132,27 @@ std::istream& load_uint16_t(std::istream & in, uint16_t & value) {
     return in;
 }
 
+/**
+ * @brief This reader will be used by the data loader template class to populate a point instance
+ *
+ */
 struct point_reader {
-    uint16_t x, y;
+    /// the x value axis of the point instance
+    uint16_t x,
+        /// the y value axis of the point instance
+        y;
 
+    /**
+     * @brief This operator is called to populate the passed point from the passed
+     *  input stream of binary data.  It uses the passed field value to determine
+     *  which point field is being read.  It will then return a reference to the
+     *  passed input stream for chaining.
+     *
+     * @param in A reference to the input stream
+     * @param pt A reference to the point instane to be populated
+     * @param field Used to determine which field is being processed
+     * @return std::istream& A reference to the passed input stream for chaining
+     */
     std::istream& operator()(std::istream& in, point & pt, int field) {
         switch(field) {
             case 0: // load x
@@ -79,10 +161,10 @@ struct point_reader {
             {
                 load_uint16_t(in, y);
                 pt = point(x,y);
-                // std::cout << "created point: " << pt <<"\n";
                 return in;
             }
-                // return (load_uint16_t(in, y), pt = point(x,y), in);
+            // The above statement is similar to the following compact statement
+            // return (load_uint16_t(in, y), pt = point(x,y), in);
             default:
                 throw std::runtime_error("invalid field");
         } // switch(field)
@@ -91,10 +173,31 @@ struct point_reader {
     }
 };
 
+/**
+ * @brief This reader will be used to populate a header instance
+ *
+ */
 struct header_reader {
-    uint16_t major, minor, patch, count;
+    /// @brief contains the major value associated to the header
+    uint16_t major,
+        /// contains the minor value associated to the header
+        minor,
+        /// contains the patch value associated to the header
+        patch,
+        /// contains the number of points associated to the header
+        count;
+    /// @brief contains the points associated to the header
     std::vector<point> points;
 
+    /**
+     * @brief This operator is used to populate the passed header instance using
+     *  the passed input stream and field value.
+     *
+     * @param in A reference to the input stream
+     * @param hdr A reference to the header instance to be populated
+     * @param field A value used to determine which field to populate
+     * @return std::istream& A reference to the passed input stream
+     */
     std::istream& operator()(std::istream& in, header & hdr, int field) {
         switch(field) {
             case 0: // read header
@@ -147,6 +250,13 @@ struct header_reader {
     }
 };
 
+/**
+ * @brief This function is used to convert the passed unsigned integer of two bytes
+ *  to the passed output stream.
+ *
+ * @param v The value that will be sent to the output stream
+ * @param out A reference to the output stream
+ */
 void store_uint16_t(uint16_t v, std::fstream &out) {
     uint8_t e = (v & 0xff) >> 8;
     out.put(e);
@@ -156,6 +266,10 @@ void store_uint16_t(uint16_t v, std::fstream &out) {
     out.put(e);
 }
 
+/**
+ * @brief Create a data file object of binary data
+ *
+ */
 void create_data_file()
 {
     std::fstream out{"data", out.binary | out.out | out.trunc};
@@ -191,11 +305,15 @@ void create_data_file()
     out.close();
 }
 
+} // namespace protocol
+} // namespace examples
+
+// @cond
 int main(int argc, char** argv) {
     std::cout << "Calling protocol reader example\n";
 
     try {
-        create_data_file();
+        examples::protocol::create_data_file();
 
         // create an input stream
         std::fstream in{ "data", in.binary | in.in };
@@ -207,13 +325,13 @@ int main(int argc, char** argv) {
             return 1;
         } // if (in.peek() == std::char_traits<char>::eof())
 
-        header value;
+        examples::protocol::header value;
 
         // define the dataLoader for a header instance...
         dataLoader<
-            header,
+            examples::protocol::header,
             char,
-            header_reader,
+            examples::protocol::header_reader,
             6,
             is_character_noop<char>,
             is_no_character<char>,
@@ -230,3 +348,4 @@ int main(int argc, char** argv) {
         return 1;
     }
 }
+// @endcond

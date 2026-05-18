@@ -1,3 +1,15 @@
+/**
+ * @file main.cpp
+ * @author Claudio Corsi (clcorsi@yahoo.com)
+ * @brief This will show you how to use the data loader template class to populate an integer vector
+ * @version 0.1
+ * @date 2026-05-17
+ *
+ * @copyright Copyright (c) 2026 Claudio Corsi
+ *
+ * [MIT License](https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE)
+ */
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -8,6 +20,9 @@
 using namespace valhalla::loader;
 // This defines the is_character and is_space operators
 using namespace valhalla::checkers;
+
+namespace examples {
+namespace intvector {
 
 /**
  * @brief This structure will load an integer value from the input stream
@@ -25,16 +40,29 @@ struct vector_reader {
      * @return std::istream& The passed input stream to allow for chaining.
      */
     std::istream & operator()(std::istream & in, std::vector<int> values, int field) {
-        int value;
-        // Since int implictly defines the input operator we can load it directly
-        in >> value;
-        // add the loaded integer into the integer vector
-        values.push_back(value);
+        switch (field) {
+            case 0: { // the vector is only expected to be populated with integers
+                int value;
+                // Since int implictly defines the input operator we can load it directly
+                in >> value;
+                // add the loaded integer into the integer vector
+                values.push_back(value);
+            }
+                break;
+
+            default: // ensure that we are only assuming that we are populating a single field
+                throw std::runtime_error("INVALID STATE");
+        } // switch (field)
+
         // return the input stream to provide chaining
         return in;
     }
 };
 
+} // namespace intvector
+} // namespace examples
+
+// @cond
 int main(int argc, char** argv) {
     // create an input stream
     std::fstream in("data.txt");
@@ -44,13 +72,13 @@ int main(int argc, char** argv) {
 
         // define the dataLoader for a integer vector...
         dataLoader<
-            std::vector<int>,         // instance type to populate
-            char,                     // character trait of input stream
-            vector_reader,            // reader
-            1,                        // number of fields
-            is_character<char, '{'>,  // opening character
-            is_character<char, '}'>,  // closing character
-            is_space                  // outer space characters
+            std::vector<int>,                   // instance type to populate
+            char,                               // character trait of input stream
+            examples::intvector::vector_reader, // reader
+            1,                                  // number of fields
+            is_character<char, '{'>,            // opening character
+            is_character<char, '}'>,            // closing character
+            is_space                            // outer space characters
         > loader(value);
         // ...initialize the integer vector
         in >> loader;
@@ -67,3 +95,4 @@ int main(int argc, char** argv) {
     }
 
 }
+// @endcond

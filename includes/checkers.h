@@ -7,7 +7,7 @@
  *
  * @copyright Copyright (c) 2024 Claudio Corsi
  *
- * @ref "MIT License" https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE
+ * [MIT License](https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE)
  */
 
 #ifndef __CHECKERS_H__
@@ -32,6 +32,13 @@ namespace checkers
  */
 template<typename Type>
 struct is_space_noop {
+    /**
+     * @brief Simple operator that just returns false.
+     *
+     * @param chr The character to compare with, not used
+     * @return true never returns this
+     * @return false this is always returned
+     */
     bool operator()(Type chr) { return false; }
 };
 
@@ -44,6 +51,20 @@ struct is_space_noop {
  */
 template<typename Type, typename IntType>
 struct is_space_base {
+    /**
+     * @brief Base operator used to determine if the passed character should be
+     *  considered as a space or not.
+     *
+     * @details This base operator will be able to determine if the passed character
+     *  is considered to be a space character or not.  It will use the standard 
+     *  isspace and and iswspace functions to determine if the passed character is
+     *  a space for char and wchar_t character inputs.  It will then throw a runtime
+     *  error if the defined Type is not defined as a char or wchar_t input type.
+     *
+     * @param chr The character that will be checked if it is a space or not
+     * @return true If the passed character is considered to be a space
+     * @return false If the passed character is not considered to be a space
+     */
     bool operator()(IntType chr) {
         if constexpr (std::is_same_v<char, Type>) {
             return std::isspace(chr) != 0;
@@ -57,18 +78,29 @@ struct is_space_base {
         }
     }
 };
+
 /**
  * @brief char based space character check.
  *
+ * @details This struct is used to determine if each passed character
+ *  is considered a space or not for char types of input characters.  This
+ *  struct is a specialized version of the is_space_base template class
+ *  for char input characters.
  */
 struct is_space : public is_space_base<char,int> {
 };
+
 /**
  * @brief wchar_t based space character check.
  *
+ * @details This struct is used to determine if each passed character
+ * is considered a space or not for wchar_t types of input characters.
+ * This struct is a specialized version of the is_space_base template
+ * class for wchar_t input characters.
  */
 struct is_wspace : public is_space_base<wchar_t, wint_t> {
 };
+
 /**
  * @brief Variable length string of characters to compare with.
  *
@@ -78,6 +110,13 @@ struct is_wspace : public is_space_base<wchar_t, wint_t> {
  */
 template<typename Char, typename IntType, typename Characters>
 struct skip_characters_base {
+    /**
+     * @brief Operator used to determine if the passed character should be skipped or not
+     *
+     * @param chr The character to check
+     * @return true If the passed character can be skipped
+     * @return false If the passed character can not be skipped
+     */
     bool operator()(IntType chr) {
         if constexpr (std::is_same_v<char, Char>) {
             return std::isspace(chr) || Characters::str.find(chr) != Characters::str.npos;
@@ -91,12 +130,15 @@ struct skip_characters_base {
         }
     }
 };
+
 template<typename Characters>
 struct skip_characters : skip_characters_base<char, int, Characters> {
 };
+
 template<typename Characters>
 struct skip_wcharacters : skip_characters_base<wchar_t, wint_t, Characters> {
 };
+
 template<typename Characters>
 struct skip_chars {
     std::string characters;
@@ -115,15 +157,45 @@ struct skip_chars {
  */
 template<typename Type, typename IntType, Type... Chars>
 struct is_space_or_base {
+    /**
+     * @brief Used to determine if the passed chr character is the same as the
+     *  passed check character.
+     *
+     * @param chr The character to check against
+     * @param check The character that we are looking for
+     * @return true If the two passed characters are the same
+     * @return false If the two passed characters are different
+     */
     bool any_of(IntType chr, Type check) {
         return chr == check;
     }
 
+    /**
+     * @brief Used to determine if the passed chr character is the same as the
+     *  passed check character.  If it is, this method will return else it will
+     *  call itself recursively comparing the next available character with the
+     *  passed chr character.
+     *
+     * @tparam Rest The type of character that is being passed along
+     * @param chr The character to check against
+     * @param check The character that we are looking for
+     * @param rest An var args of the remaining characters to check against
+     * @return true If the passed chr is the same as check or the recursive call successed
+     * @return false If the passed chr is different from all of the remaining characters
+     */
     template<typename... Rest>
     bool any_of(IntType chr, Type check, Rest... rest) {
         return chr == check || any_of(chr, rest...);
     }
 
+    /**
+     * @brief Determines if the passed chr character is part of the list of characters
+     *  that it is being compared to.
+     *
+     * @param chr The character that we are checking for
+     * @return true If the passed character is part of the list of characters
+     * @return false If the passed character is not part of the list of characters
+     */
     bool operator()(IntType chr) {
         if constexpr (std::is_same_v<char, Type>) {
             return std::isspace(chr) || any_of(chr, Chars...);
@@ -137,6 +209,7 @@ struct is_space_or_base {
         }
     }
 };
+
 /**
  * @brief Variable length character skipping for char input stream.
  *
@@ -145,6 +218,7 @@ struct is_space_or_base {
 template<char... Chars>
 struct is_space_or : public is_space_or_base<char, int,Chars...> {
 };
+
 /**
  * @brief Variable length character skipping for wchar_t input stream.
  *
@@ -153,6 +227,7 @@ struct is_space_or : public is_space_or_base<char, int,Chars...> {
 template<wchar_t... Chars>
 struct is_wspace_or : public is_space_or_base<wchar_t, wint_t,Chars...> {
 };
+
 /**
  * @brief Used to skip zero or more characters using the passed IsSpace
  *      struct.

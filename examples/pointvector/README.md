@@ -97,8 +97,8 @@ data loader template class that will populate the point vector as.
 
 We now have defined a data loader template class above that is capable of
 loading point instances into a point vector instance.  Where the point
-instance have the format { <x_value> <y_value>} and the point vector has
-the format [ <point> ... ].  The data loader template class removes the
-need to worry about implementing the need to check for the different
-delimiters used and allow one to focus on how to format and load the
-data into the point vector.
+instance have the format { &lt;x\_value&gt; &lt;y\_value&gt; } and the
+point vector has the format [ &lt;point&gt; ... ].  The data loader
+template class removes the need to worry about implementing the need to
+check for the different delimiters used and allow one to focus on how to
+format and load the data into the point vector.

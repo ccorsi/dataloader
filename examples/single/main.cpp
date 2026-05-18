@@ -1,3 +1,15 @@
+/**
+ * @file main.cpp
+ * @author Claudio Corsi (clcorsi@yahoo.com)
+ * @brief This example shows how to use the data loader template class to load a single point instance
+ * @version 0.1
+ * @date 2026-05-17
+ *
+ * @copyright Copyright (c) 2026 Claudio Corsi
+ *
+ * [MIT License](https://raw.githubusercontent.com/ccorsi/dataloader/main/LICENSE)
+ */
+
 #include <iostream>
 #include <fstream>
 
@@ -6,12 +18,36 @@
 using namespace valhalla::loader;
 using namespace valhalla::checkers;
 
+namespace examples {
+namespace single {
+
+/**
+ * @brief A class that will contain the x and y axis values of a point on a plain.
+ *
+ */
 class point {
-    int m_x, m_y;
+    /// @brief The value of the x-axis
+    int m_x,
+        /// The value of the y-axis
+        m_y;
 public:
     point() = default;
+    /**
+     * @brief Construct a new point object using the passed x and y values
+     *
+     * @param x The value of the point x-axis
+     * @param y The value of the point y-axis
+     */
     point(int x, int y) : m_x(x), m_y(y) {}
 
+    /**
+     * @brief This operator will display the contents of the passed point to the passed
+     *  output stream
+     *
+     * @param out A reference to the output stream
+     * @param pt A reference to the point to be displayed
+     * @return std::ostream& A reference to the passed output stream for chaining
+     */
     friend std::ostream & operator<<(std::ostream & out, const point & pt) {
         return out << "point[x=" << pt.m_x << ",y=" << pt.m_y << "]";
     }
@@ -23,6 +59,14 @@ public:
  *
  */
 struct point_reader {
+    /**
+     * @brief Operator used to populate the passed point using the passed input stream.
+     *
+     * @param in A reference to the input stream
+     * @param p A reference to the point
+     * @param field Used to determine which attribute in the point to populate
+     * @return std::istream& A reference to the passed input stream for chaining
+     */
     std::istream & operator()(std::istream & in, point & p, int field) {
         int x;
         // load data for the x field
@@ -39,6 +83,10 @@ struct point_reader {
     }
 };
 
+} // namespace single
+} // namespace examples
+
+// @cond
 int main(int argc, char** argv) {
     std::cout << "Calling single reader example\n";
 
@@ -46,13 +94,13 @@ int main(int argc, char** argv) {
         // create an input stream
         std::fstream in("data.txt");
 
-        point value;
+        examples::single::point value;
 
         // define the dataLoader for a point instance...
         dataLoader<
-            point,
+            examples::single::point,
             char,
-            point_reader,
+            examples::single::point_reader,
             1,
             is_character<char,'{'>,
             is_character<char,'}'>,
@@ -69,3 +117,4 @@ int main(int argc, char** argv) {
         return 1;
     } // catch (std::exception & ex)
 }
+// @endcond

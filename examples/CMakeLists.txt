@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10.0)
 project("Data Loader Examples"
+    VERSION 0.9.4
+    DESCRIPTION "Template Based Data Loader Class Examples"
+    HOMEPAGE_URL "https://github.com/ccorsi/dataloader/tree/main"
     LANGUAGES C CXX)
 
 include(CTest)
