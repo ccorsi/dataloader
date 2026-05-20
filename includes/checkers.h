@@ -139,14 +139,33 @@ template<typename Characters>
 struct skip_wcharacters : skip_characters_base<wchar_t, wint_t, Characters> {
 };
 
+/**
+ * @brief This operator can be used to skip a character if it is a space or
+ *  is part of the defined Characters string.
+ *
+ * @warning NOTE that this is an experimental implementation that currently is
+ *  not functional within the data loader template class implementation.
+ *
+ * @tparam Characters A string of characters that will be checked against
+ */
 template<typename Characters>
 struct skip_chars {
+    /// @brief Contains user defined characters that are consider being spaces
     std::string characters;
     skip_chars() : characters(Characters::str) {}
+    /**
+     * @brief This operator will determine if the passed character is considered
+     *  as a space.
+     *
+     * @param chr The character to compare against
+     * @return true If the passed character is consider as a space
+     * @return false If the passed character is not consider as a space
+     */
     bool operator()(int chr) {
         return std::isspace(chr) || characters.find(chr) != characters.npos;
     }
 };
+
 /**
  * @brief variable length character check method used to determine if a given
  *      character should be skipped or not.
@@ -237,13 +256,22 @@ struct is_wspace_or : public is_space_or_base<wchar_t, wint_t,Chars...> {
  */
 template<typename Char, typename IsSpace>
 struct skip_spaces {
+    /// @brief A reference to an instance used to check if the passed character is a space like character
     IsSpace isSpace;
+    /**
+     * @brief This operator is called to determine if the passed input stream contain
+     *  spaces to be skipped
+     *
+     * @param in A reference to the input stream used to determine if there are spaces to skip
+     * @return std::basic_istream<Char>& A reference to the passed input stream for chaining
+     */
     std::basic_istream<Char> & operator()(std::basic_istream<Char> & in) {
         while (isSpace(static_cast<Char>(in.peek()))) in.get();
         return in;
     }
 };
-// This requres c++20 to build
+
+// This requires c++20 to build
 // template<typename Container, Container characters>
 // struct skip_chars {
 //     bool operator()(int chr) { return std::isspace(chr) || characters.find(chr) != characters.end(); }
@@ -256,6 +284,13 @@ struct skip_spaces {
  */
 template<typename Char>
 struct is_character_noop {
+    /**
+     * @brief This operator will always return truw no matter what character was passed.
+     *
+     * @param in A reference to the input stream
+     * @return true This is always return irrespective to the passed character
+     * @return false This will never be returned
+     */
     bool operator()(std::basic_istream<Char> & in) {
         return true;
     }
@@ -271,6 +306,16 @@ struct is_character_noop {
  */
 template<typename Char, Char... Chars>
 struct is_character {
+    /**
+     * @brief This operator will determine if the passed input stream next character
+     *  is the same as the passed check character.  It will digest the character if
+     *  it is equivalent to the passed check character.
+     *
+     * @param in A reference to the input stream containing the character to check
+     * @param check The character to compare with the next character in the input stream
+     * @return true If the next character in the input stream is equavalent to check
+     * @return false If the next character in the input stream is not equivalent to check
+     */
     bool operator()(std::basic_istream<Char> & in, Char check) {
         if (static_cast<Char>(in.peek()) != check) {
             return false;
@@ -279,6 +324,19 @@ struct is_character {
         return true;
     }
 
+    /**
+     * @brief This operator will determine if the passed input stream next character
+     *  is the same as the passed check character.  It will digest the character if it
+     *  is equivalent to the passed chech character.  If not, it will recursively call
+     *  this operator with the next available character to check against.
+     *
+     * @tparam Rest The remaining set of characters to check against
+     * @param in A reference to the input stream with the next character
+     * @param check The character to compare the next character in the input stream
+     * @param rest The remaining set of characters to compare to the next input character
+     * @return true If this check character is equivalent or subsequent recursive calls
+     * @return false If this chech character is different and subsequent recursive calls
+     */
     template<typename... Rest>
     bool operator()(std::basic_istream<Char> & in, Char check, Rest... rest) {
         if (static_cast<Char>(in.peek()) != check) {
@@ -288,6 +346,14 @@ struct is_character {
         return true;
     }
 
+    /**
+     * @brief This operator is called to determine if the next input stream character
+     *  is equivalent to one of the list of characters associated to this instance.
+     *
+     * @param in A reference to the input stream containing the next character
+     * @return true If the next character is equivalent to one of the expected characters
+     * @return false If the next character is different to all of the expected characters
+     */
     bool operator()(std::basic_istream<Char> & in) {
         return operator()(in, Chars...);
     }
@@ -300,13 +366,19 @@ struct is_character {
  *      the data loader template class.  Specifically the case in which the
  *      character being checked will not be consumed.
  *
- * @todo confirm that the above statement is true.
- *
  * @tparam Char The character stream we are going to use, char or wchar_t.
  */
 template<typename Char>
 struct is_no_character {
+    /// @brief Used to determine which input should return true or false
     int m_count = 0;
+    /**
+     * @brief This operator is called to skip every other character in the input stream
+     *
+     * @param in A reference to the input stream with the next character
+     * @return true For every even count
+     * @return false For every odd count
+     */
     bool operator()(std::basic_istream<Char> & in) {
         m_count = ++m_count % 2;
         return m_count == 0;

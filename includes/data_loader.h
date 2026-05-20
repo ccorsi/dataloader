@@ -31,6 +31,11 @@ class Field {
     int m_field;
     int m_fields;
 public:
+    /**
+     * @brief Construct a new Field object using the passed number of expected fields to process
+     *
+     * @param fields The number of fields that are going to be populate
+     */
     Field(const int fields) : m_fields(fields), m_field(0) {
         if (m_fields < 1) {
             throw std::runtime_error("Invalid number of fields, has to be 1 or greater");
@@ -119,14 +124,44 @@ class dataReader {
     std::basic_istream<Char> & load(std::basic_istream<Char> & in) { return m_reader(in, m_data, m_fields.field()); }
 public:
     dataReader() = default;
+    /**
+     * @brief Construct a new data Reader object will pass a reference to the instance that will be
+     *  populated and will also keep track of which attribute will be populate next for the passed
+     *  instance.
+     *
+     * @param data A reference to the instance that will be populated
+     */
     dataReader(Type & data) : m_data(data), m_fields(fields) {}
 
+    /**
+     * @brief This operator will be called whenever you need to populate this instance data
+     *  instance.  It will use the pass input stream and reader to populate the referenced
+     *  data instance.
+     *
+     * @param in A reference to the input stream
+     * @param reader A reference to the reader instance used to populate the data instance
+     * @return std::basic_istream<Char>& A reference to the passed input stream for chaining
+     */
     friend std::basic_istream<Char> & operator>>(std::basic_istream<Char> & in, dataReader & reader) {
         return reader.load(in);
     }
 
+    /**
+     * @brief This operator will is used to determine if there are any fields left to be populate
+     *  for the data instance associated to this instance.
+     *
+     * @return true If there are other fields that need to be populated
+     * @return false If there aren't any fields left to be populated
+     */
     bool operator()() { return m_fields(); }
 
+    /**
+     * @brief This function will return the current field that is being populated.
+     *  This information will be used by the reader to determine which attribute to
+     *  be populated next.
+     *
+     * @return int The current field that is being populated
+     */
     inline int field() { return m_fields.field(); }
 }; // class dataReader<Type,Field,Reader>
 
@@ -183,8 +218,23 @@ class dataLoader {
     Type & m_type;
 public:
     dataLoader() = default;
+    /**
+     * @brief Construct a new data Loader object where the instance to be populated is
+     *  passed as a reference to this instance of the data loader template class.
+     *
+     * @param type A reference to the instance that this data loader template class will populate
+     */
     dataLoader(Type & type) : m_type(type) {}
 
+    /**
+     * @brief This operator is called to populate this instance data type reference.  It will
+     *  use the passed input stream to process the data required to populate the data type
+     *  instance.
+     *
+     * @param in A reference to the input stream with the data to populate the data instance
+     * @param loader A reference to a data loader used to populate the data instance
+     * @return std::basic_istream<Char>& A reference to the input stream for chaining
+     */
     friend std::basic_istream<Char> & operator>>(std::basic_istream<Char> & in, dataLoader &loader) {
         // NOTE: The following if constexpr will only generate specific code depending on the type of
         //       instance Type is defined.
