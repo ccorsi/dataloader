@@ -1,10 +1,16 @@
+# This workflow will only be executed if a tag was defined and we are currently in the main branch.
+# All other configurations will not be executed.  This will ensure that the officially generated
+# documentations will only be generaetd within those parameters.
+
 name: Deploy Data Loader Documentation
 
 on:
   pull_request:
-    branches: ["main"]
+    tags:
+      - 'v[0-9]+.*'
   push:
-    branches: ["main"]
+    tags:
+      - 'v[0-9]+.*'
 
 permissions:
   contents: read
@@ -13,6 +19,8 @@ permissions:
 
 jobs:
   deploy:
+    # Determine if we are within the main branch before generating the official documentation
+    if: github.event.base_ref == 'refs/head/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.pages_url }}
