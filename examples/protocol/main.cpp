@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <random>
 
 #include "data_loader.h"
 
@@ -290,17 +291,22 @@ void create_data_file()
     store_uint16_t(minor, out);
     store_uint16_t(patch, out);
 
-    std::vector<uint16_t> points = {
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-    };
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint16_t> distrib(10, 20);
 
-    uint16_t count = static_cast<uint16_t>(points.size()) / 2;
+    // generate the number of points that will be part of the header points vector
+    uint16_t count = distrib(gen);
 
+    // store the number of points that will be stored within the header point vector
     store_uint16_t(count, out);
 
-    for (uint16_t v : points) {
-        store_uint16_t(v, out);
-    } // for (uint16_t v : points)
+    std::uniform_int_distribution<uint16_t> axis(0, 65535);
+    for (auto cnt = 0 ; cnt < count ; cnt++) {
+        // store the point definition in binary data
+        store_uint16_t(axis(gen), out);
+        store_uint16_t(axis(gen), out);
+    } // for (auto cnt = 0 ; cnt < count ; cnt++)
 
     out.close();
 }
