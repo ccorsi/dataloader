@@ -1,17 +1,17 @@
 [![Data Loader Template Class Build and Tests](https://github.com/ccorsi/dataloader/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/ccorsi/dataloader/actions/workflows/build_and_test.yml)
 [![Data Loader Documentation](https://github.com/ccorsi/dataloader/actions/workflows/docs.yml/badge.svg)](https://github.com/ccorsi/dataloader/actions/workflows/docs.yml)
 
-# Data Loader {#mainpage}
+# Data Loader
 
 This project contains a flexible data loader that can be used to load data
-from an input stream into an instance of a class.  The data loader provides
+into an instance using an input stream.  The data loader provides
 different ways that a user can load data into their objects.
 
 Before diving into any specifics about the data loader template class.  We
 should start by describing the motiviation behind this class.  The
 incarnation of the data loader template class was inspired by how one can
 initialize a complex data type within a C++ source code file.  For instance,
-we can initialize a std::vector&lt;int&gt; by using the following syntax,
+we can initialize a <code>std::vector<int></code> by using the following syntax,
 
 ```cpp
     ...
@@ -23,26 +23,26 @@ While the above is fairly simple to add within a C++ source file.  We will not
 need to use the data loader template class to perform such an initialization.
 The benefit of the data loader template class is when you have multiple
 instances of data that we'd like to load during runtime.  This is when you
-start to see the benefit of using the data loader template class.  It allows
+start to see the benefit in using the data loader template class.  It allows
 one to be able to alter the data file without having to apply any changes to
 the source file itself.  Now that we have the inspiration of the data loader
 template class.  We turn to describing its definition and use cases.
 
-The first thing that the data loader template class needs is its template
+The first thing that the data loader template class needs is to define its template
 parameters. The data loader template class requires at least two out of eight
 template parameters.  The first template parameter is the **Type** of instance
 that is being populated.  It then expects the **Char** template parameter which
-is used to define a basic\_istream&lt;**Char**&gt; input stream.  This can be set
-to __char__ or __wchar_t__ character type input stream.  This is the default
+is used to define a <code>basic_istream<**Char**></code> input stream.  This can be
+set to __char__ or __wchar_t__ character type input stream.  This is the default
 requirement that one needs to be able to use the data loader template class to
 load data into an instance.  The above case assumes that the **Type** template
 parameter defines the
-basic\_istream&lt;**Char**&gt; & operator&lt;&lt;(basic\_istream&lt;**Char**&gt; &)
-operator.
+<code>basic_istream<**Char**>& operator<<(basic_istream<**Char**>&)</code> operator.
 
-While the above describes the required minimum template parameters of the data loader.
-It doesn't explain how one goes about initializing and using a data loader template class.
-We will start by explaining the other aspects of the data loader template class.
+While the above describes the required minimum template parameters of the data loader
+template class.  It doesn't explain how one goes about initializing and using a data
+loader template class.  We will start by explaining the other aspects of the data
+loader template class.
 
 The data loader template class is defined as:
 
@@ -68,41 +68,41 @@ will describe what each parameter means.
 
 | __Parameter Name__ | __Description__ |
 | --- | --- |
-| Type | The type of object being populated |
-| Char | The type of input stream being used, __char__ or __wchar_t__ |
-| Reader | The Reader class used to process the data with |
-| fields | The number of fields populate in the Type object, defaults to __1__ |
-| IsOpenChar | Character used to demarcate opening of object data |
-| IsCloseChar | Character used to demarcate closing of object data |
-| IsSpace | Which spaces to skip before and after opening/closing characters |
-| IsSpaceInner | Which spaces to skip within the opening/closing characters |
+| Type         | The type of object being populated |
+| Char         | The type of input stream being used, __char__ or __wchar_t__ |
+| Reader       | The Reader class used to process the data with, defaults to <code>valhalla::loader::reader<**Type**,**Char**></code> |
+| fields       | The number of fields populate in the Type object, defaults to __1__ |
+| IsOpenChar   | Character used to demarcate opening of object data, defaults to <code>void</code> |
+| IsCloseChar  | Character used to demarcate closing of object data, defaults to <code>void</code> |
+| IsSpace      | Which spaces to skip before and after opening/closing characters, defaults to <code>valhalla::checkers::is_space</code> |
+| IsSpaceInner | Which spaces to skip within the opening/closing characters, defaults to <code>IsSpace</code> |
 
 While the above is fairly clear it doesn't explain the details that are
 involved with these template parameters.  Let us then start with the most
 obvious statement.  That is that the __Type__ is the object that we intend to
 populate.  This can be any class, struct or primitive type like int, long,
-std::string, etc.  Thou we know what object we want to populate we now need
+std::string, etc.  Thou, we know what object we want to populate we now need
 to determine the type of stream that we are using.  This is accomplished
 using the __Char__ template parameter.  This basically is used to tell the
 data loader template class if we are using a __char__ or __wchar_t__ input
-stream.  We've thus explained the most basic data loader template parameters.
+stream.  We've now explained the most basic data loader template parameters.
 We now turn to the more involved template parameters.
 
 We start with how the __Reader__ template parameter is used.  This parameter
 has to define a struct or class that implements the following operator:
 
 ```cpp
-    virtual std::basic_istream<Char> & operator()(std::basic_istream<Char> & in,
-                                                  Type & type, int field);
+    virtual std::basic_istream<Char>& operator()(std::basic_istream<Char>& in,
+                                                 Type& type, int field);
 ```
 
 The above operator will be called by the data loader template class to actually
 load the data into the **Type** instance.  The first and second parameter is self
 explainatory but the third parameter is specific to how one wants to load the
 data into the **Type** instance.  For instance, one can define a struct or class
-that implements the above operator to populate a seperate field or it can read
-all of the data for all the fields for the **Type** instance.  Let us then look at
-what this might look like.  Let us take a simple class with two fields:
+that implements the above operator to populate each seperate field or it can read
+all of the data for all the fields at once for the **Type** instance.  Let us then
+look at what this might look like.  Let us take a simple class with two defined fields:
 
 ```cpp
 class point {
@@ -131,7 +131,7 @@ __IsCloseChar__ template parameters next.
 
 The __IsOpenChar__ and __IsCloseChar__ template parameters are used to inform
 the data loader template class which characters are used to encapsulate the
-data that will be loaded into the instance.  These characters can be anything
+data associated with the instance being populated.  These characters can be anything
 that one chooses.  For example, the point might use the '{' and '}' characters
 as the open and close characters to delineate what is part of a point instance.
 For example we might have an input stream that contains the following data:
@@ -146,16 +146,16 @@ that you can use.  There is no requirement that you need to state a given
 set of open and close characters.  For instance, a simple integer doesn't
 require any encapsulating characters.  The data loader template class offers
 a solution to this case.  These are just some examples that can be used.
-There are several implementations that one can pick from depending on the
+There are several other implementations that one can pick from depending on the
 particular use case that one encounters.  Here is a table of the different
-implementations that can be used to set the __IsOpenChar__ and __IsCloseChar__
+implementations that can be assigned to the __IsOpenChar__ and __IsCloseChar__
 template parameters:
 
 | Name | Description |
 | --- | --- |
-| is\_character\_noop&lt;Char&gt; | This is used when there is no encapsulating character |
-| is\_character&lt;Char,Char...Chars&gt; | This is used to define one or more character that is used to encapulate a data object |
-| is\_no\_character&lt;Char&gt; | This is used in the case that we are loading a primitive type and we don't want to consume the character.  This is useful only for the __IsCloseChar__ template parameter  |
+| <code>is_character_noop<Char></code>         | This is used when there is no encapsulating character |
+| <code>is_character<Char,Char...Chars></code> | This is used to define one or more character that is used to encapulate a data object |
+| <code>is_no_character<Char></code>           | This is used in the case that we are loading a primitive type and we don't want to consume the character.  This is useful only for the __IsCloseChar__ template parameter  |
 
 While the first two options are clear enough.  The requirement of the third option isn't
 as obvious.  The last option was required to solve a specific type of issue
@@ -187,11 +187,11 @@ characters.  There are several predefined space-like operators avaliable:
 
 | Name | Description |
 | --- | --- |
-| is\_space\_noop&lt;Char&gt; | This is used when no spaces need to be skipped for the Char stream type, char or wchar\_t |
-| is\_space | This is a wrapper around the standard isspace method |
-| is\_wspace | This is a wrapper around the standard iswspace method |
-| is\_space\_or&lt;char...Chars&gt; | This extends the is\_space by including one or more user defined white space characters |
-| is\_wspace\_or&lt;wchat_t...Chars&gt; | This extends the is\_wspace by including one or more user defined white space characters |
+| <code>is_space_noop<Char></code>           | This is used when no spaces need to be skipped for the Char stream type, char or wchar\_t |
+| <code>is_space</code>                      | This is a wrapper around the standard isspace method |
+| <code>is_wspace</code>                     | This is a wrapper around the standard iswspace method |
+| <code>is_space_or<char...Chars></code>     | This extends the is\_space by including one or more user defined white space characters |
+| <code>is_wspace_or<wchat_t...Chars></code> | This extends the is\_wspace by including one or more user defined white space characters |
 
 While the above options should cover most if not all of the different cases.
 You can implement your own by creating a struct or class that implements the
@@ -213,13 +213,13 @@ the data into a point instance using the data loader template class.
 
 This example will populate the point instance using a single instance of the
 data loader template class.  We first need to create a point **reader** that will
-be passed to the data loader template class that will be used to read the data and
-populate the point instance.
+be passed to the data loader template class to be used to read the data and populate
+the point instance.
 
 ```cpp
 struct point_reader {
     int m_x;
-    std::istream & operator()(std::istream & in, point & p, int field) {
+    std::istream& operator()(std::istream& in, point& p, int field) {
         switch (field) {
             case 1: // m_x
                 in >> m_x;
@@ -247,7 +247,7 @@ load the data into an instance of a point class.
 using namespace valhalla::loader;
 using namespace valhalla::checkers;
 
-std::istream& load_point(std::istream& in, point & pt) {
+std::istream& load_point(std::istream& in, point& pt) {
     dataLoader<
         point,
         char,
@@ -263,7 +263,7 @@ std::istream& load_point(std::istream& in, point & pt) {
 ```
 
 The above will then populate the point instance pt using the dataLoader instance
-with the data that is processed using the input stream.  The above is one
-example of how one can use the data loader template class to populate
-instances.  The examples sub-directory contains examples on how you can use
-the data loader template class for different user cases.
+with the data that is processed using the input stream.  The above is one example
+of how one can use the data loader template class to populate instances.  The
+examples sub-directory contains several examples on how you can use the data loader
+template class for different use cases.
