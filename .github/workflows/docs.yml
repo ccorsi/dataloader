@@ -20,7 +20,7 @@ permissions:
 jobs:
   deploy:
     # Determine if we are within the main branch before generating the official documentation
-    if: github.event.base_ref == 'refs/head/main'
+    if: contains(github.event.base_ref, 'refs/heads/main')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.pages_url }}
