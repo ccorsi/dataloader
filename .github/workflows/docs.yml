@@ -8,9 +8,13 @@ on:
   pull_request:
     tags:
       - 'v[0-9]+.*'
+    branch:
+      - 'main'
   push:
     tags:
       - 'v[0-9]+.*'
+    branch:
+      - 'main'
 
 permissions:
   contents: read
@@ -20,7 +24,7 @@ permissions:
 jobs:
   deploy:
     # Determine if we are within the main branch before generating the official documentation
-    if: contains(github.base_ref, 'refs/heads/main')
+    # if: contains(github.base_ref, 'refs/heads/main')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.pages_url }}
@@ -49,3 +53,12 @@ jobs:
       - name: Deploy the Data Loader Pages to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+      - name: Git Branch name
+        run: |
+          echo "Listing branch names"
+          git branch -l
+          echo "Listing branch without preceeding * character"
+          git branch -l | grep "^*" | sed 's/\* //g'
+          echo "Listing branches that contain the 'main' title"
+          git branch -l | grep main | sed 's/\* //g'
