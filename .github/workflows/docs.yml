@@ -8,9 +8,13 @@ on:
   pull_request:
     tags:
       - 'v[0-9]+.*'
+    branch:
+      - 'main'
   push:
     tags:
       - 'v[0-9]+.*'
+    branch:
+      - 'main'
 
 permissions:
   contents: read
@@ -19,8 +23,6 @@ permissions:
 
 jobs:
   deploy:
-    # Determine if we are within the main branch before generating the official documentation
-    if: github.event.base_ref == 'refs/head/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.pages_url }}
